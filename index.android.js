@@ -1,9 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
-
 import React, { Component } from 'react';
 import {
   AppRegistry,
@@ -16,30 +10,26 @@ import {
   TextInput,
   Button,
   Dimensions,
-  DatePickerAndroid
+  DatePickerAndroid,
+  Alert
 } from 'react-native';
 
-//
-// export default class SecretSanta extends Component {
-//   render() {
-//     return (
-//       <View style={styles.container}>
-//         <Text style={styles.welcome}>
-//           Welcome to React Native!
-//         </Text>
-//         <Text style={styles.instructions}>
-//           To get started, edit index.android.js
-//           helllo
-//         </Text>
-//         <Text style={styles.instructions}>
-//           Double tap R on your keyboard to reload,{'\n'}
-//           Shake or press menu button for dev menu
-//         </Text>
-//       </View>
-//     );
-//   }
-// }
 const windowWidth = Dimensions.get('window').width;
+
+class Card extends Component {
+  render() {
+    return (
+      <View style={styles.cardContainer}>
+        <View style={styles.cardTitle}>
+          <Text style={styles.cardTitle.Text}>{this.props.title}</Text>
+        </View>
+        <View style={styles.children}>
+          {this.props.children}
+        </View>
+      </View>
+    );
+  }
+}
 
 class CreateSantaEvent extends Component {
   constructor(props) {
@@ -48,21 +38,29 @@ class CreateSantaEvent extends Component {
       text: 'ddfgdfg'
     }
   }
+
+  async createButtonPress() {
+    const {month, day, year} = await DatePickerAndroid.open({date: new Date()});
+    Alert.alert(''+ month + day + year);
+  }
+
   render() {
     return (
       <View>
-        <TextInput
-          style={styles.input}
-          onChangeText={() => null}
-          value={this.state.text}
-        />
-        <View style={{width: windowWidth * .5}}>
-          <Button
-            style={styles.button}
-            onPress={() => null}
-            title="Create Event"
+        <Card title="Pick a Date">
+          <TextInput
+            style={styles.input}
+            onChangeText={() => null}
+            value={this.state.text}
           />
-        </View>
+          <View style={{width: windowWidth * .5}}>
+            <Button
+              style={styles.button}
+              onPress={this.createButtonPress}
+              title="Create Event"
+            />
+          </View>
+        </Card>
       </View>
     );
   }
@@ -107,25 +105,31 @@ export default class SecretSanta extends Component {
 }
 
 const styles = StyleSheet.create({
-  // container: {
-  //   flex: 1,
-  //   justifyContent: 'center',
-  //   alignItems: 'center',
-  //   backgroundColor: '#F5FCFF',
-  // },
-  // welcome: {
-  //   fontSize: 20,
-  //   textAlign: 'center',
-  //   margin: 10,
-  // },
-  // instructions: {
-  //   textAlign: 'center',
-  //   color: '#333333',
-  //   marginBottom: 5,
-  // },
+  cardTitle: {
+    borderBottomWidth: 0.5,
+    borderTopLeftRadius: 3,
+    borderTopRightRadius: 2.5,
+    borderBottomColor: '#d6d7da',
+    backgroundColor: '#f6f7f8',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  cardTitleText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  cardContainer: {
+    borderRadius: 3,
+    borderWidth: 0.5,
+    borderColor: '#d6d7da',
+    backgroundColor: '#ffffff',
+    margin: 10,
+    marginVertical: 5,
+    overflow: 'hidden',
+  },
   button: {
     width: windowWidth * .3,
-    backgroundColor: 'crimson'
+    backgroundColor: 'crimson',
   },
   input: {
     height: 40,
@@ -137,10 +141,6 @@ const styles = StyleSheet.create({
   },
   navBar: {
     backgroundColor: 'gainsboro',
-    // height: 40,
-    // paddingTop: 20,
-    // paddingBottom: 20,
-    // marginBottom: 20,
   },
 });
 
