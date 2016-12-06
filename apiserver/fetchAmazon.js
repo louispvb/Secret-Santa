@@ -1,9 +1,11 @@
 // AKIAIH7PXSJ6OJT4YNAA
 require('isomorphic-fetch');
+require('es6-promise').polyfill();
 var moment = require('moment');
 var crypto = require('crypto');
 var parseString = require('xml2js').parseString;
-var config = require('./productapi.config.js')
+var config = require('./productapi.config.js');
+var assign = require('lodash').assign;
 
 // Had to register an IAM user with an accessKey, and secretKey, create a new policy
 // because there's no included policies to allow usage of Product API, make a group,
@@ -16,48 +18,85 @@ var config = require('./productapi.config.js')
 // parse the XML string into a DOM parser,
 // parse the XML DOM elements to JSON
 
+// EXAMPLE USAGE
+// where config has keys {secretKey, accessKey, associateID}
 
-let getTimeStamp = () => moment.utc().format('YYYY-MM-DDTHH:mm:ss')+'Z';
+// new AmazonSearch(config)
+//   .itemLookup({ItemId: 'B00CPZW2BI'})
+//   .then(data => console.log(JSON.stringify(data)));
 
-let productLookup = function (opts) {
-  opts.
-};
+// new AmazonSearch(config)
+//   .similarityLookup({ItemId: 'B00CPZW2BI'})
+//   .then(data => console.log(JSON.stringify(data, null, 2)));
 
-let uri = `http://webservices.amazon.com/onca/xml?Service=AWSECommerceService&AWSAccessKeyId=${accessKey}&Operation=ItemLookup&ItemId=0679722769&ResponseGroup=Images,ItemAttributes&Version=2013-08-01`
-  + '&Timestamp=' + getTimeStamp() + '&AssociateTag=' + associateID;
+class AmazonSearch {
+  constructor({secretKey, accessKey, associateID}) {
+    this.secretKey = secretKey;
+    this.baseURL = 'http://webservices.amazon.com/onca/xml?';
+    this.baseOpts = {
+      Service: 'AWSECommerceService',
+      AWSAccessKeyId: accessKey,
+      AssociateTag: associateID,
+      ResponseGroup: 'Images,ItemAttributes',
+      Version: '2013-08-01'
+    }
+  }
+  _generateHmac(data, awsSecretKey, algorithm, encoding) {
+    encoding = encoding || "base64";
+    algorithm = algorithm || "sha256";
+    return crypto.createHmac(algorithm, awsSecretKey).update(data).digest(encoding);
+  }
+  _getSignature(toSign) {
+    return this._generateHmac(toSign, this.secretKey);
+  }
+  _getTimeStamp() { return moment.utc().format('YYYY-MM-DDTHH:mm:ss')+'Z' }
+  _createFullURLString(opts) {
+    let fullOpts = assign(opts, {
+      Timestamp: this._getTimeStamp(),
+    });
+    let encodedSortedParams = [];
+    let sortedKeys = Object.keys(fullOpts).sort((a, b) => a.charCodeAt(0) - b.charCodeAt(0));
+    sortedKeys.forEach(k => {
+      let val = encodeURIComponent(fullOpts[k]);
+      let key = encodeURIComponent(k);
+      encodedSortedParams.push(`${key}=${val}`);
+    });
+    encodedSortedParams = encodedSortedParams.join('&');
+    let strToSign = 'GET\nwebservices.amazon.com\n/onca/xml\n' + encodedSortedParams;
+    let signature = this._getSignature(strToSign);
+    let fullURL = this.baseURL
+      + encodedSortedParams
+      + '&Signature=' + encodeURIComponent(signature);
+    return fullURL;
+  }
 
-let URIComponents = uri.split('?')[1].split('&').map(kv => {
-  let [key, val] = kv.split('=');
-  return key + '=' + encodeURIComponent(val);
-});
-let sorted = URIComponents.sort((a, b) => a.charCodeAt(0) - b.charCodeAt(0)).join('&');
-let toSign =
-`GET
-webservices.amazon.com
-/onca/xml\n` + sorted;
-console.log(toSign);
+  _fetchData(url) {
+    return fetch(url)
+      .then(resp => resp.text())
+      .then(text => new Promise((resolve, reject) => {
+        parseString(text, (err, result) => {
+          let lookupError = result['ItemLookupErrorResponse'];
+          if (err) reject(err);
+          else if (lookupError) reject(JSON.stringify(lookupError, null, 2));
+          else resolve(result.ItemLookupResponse
+            ? result.ItemLookupResponse : result.SimilarityLookupResponse);
+        });
+      }));
+  }
 
-function generateHmac (data, awsSecretKey, algorithm, encoding) {
-  encoding = encoding || "base64";
-  algorithm = algorithm || "sha256";
-  return crypto.createHmac(algorithm, awsSecretKey).update(data).digest(encoding);
+  _lookupOperation(opts, operation) {
+    let lookupOpts = assign(this.baseOpts, opts, {
+      Operation: operation
+    });
+    let url = this._createFullURLString(lookupOpts);
+    return this._fetchData(url);
+  }
+
+  itemLookup(opts) {
+    return this._lookupOperation(opts, 'ItemLookup');
+  }
+
+  similarityLookup(opts) {
+    return this._lookupOperation(opts, 'SimilarityLookup');
+  }
 }
-var signature = generateHmac(toSign, secretKey);
-
-let finaluri = 'http://webservices.amazon.com/onca/xml?'
-
-let signedURL = uri + '&Signature=' + encodeURIComponent(signature);
-
-
-// let parseXMLtoJSON = str => {
-//   let xml = new DOMParser().parseFromSring(str, 'text/xml');
-//   return xmlToJson(xml);
-// };
-// console.log(getTimeStamp(), encodeURIComponent(getTimeStamp()));
-let reqURL = `http://webservices.amazon.com/onca/xml?Service=AWSECommerceService&AWSAccessKeyId=AKIAIH7PXSJ6OJT4YNAA&Operation=ItemSearch&Keywords=the%20hunger%20games`;
-let reqURL2 = 'http://webservices.amazon.com/onca/xml?Service=AWSECommerceService&AWSAccessKeyId=AKIAIH7PXSJ6OJT4YNAA&Operation=ItemLookup&ItemId=0679722769&ResponseGroup=ItemAttributes,Offers,Images,Reviews&Version=2013-08-01'
-fetch(signedURL)
-  .then(resp => resp.text())
-  .then(text => parseString(text, (err, res) =>{
-    console.log(JSON.stringify(res.ItemLookupResponse.Items, null, 2));
-  }));
