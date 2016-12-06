@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import * as _ from 'lodash/fp';
+_.map = _.map.convert({'cap': false});
 import {
   AppRegistry,
   StyleSheet,
@@ -22,12 +24,63 @@ class Card extends Component {
     return (
       <View style={styles.cardContainer}>
         <View style={styles.cardTitle}>
-          <Text style={styles.cardTitle.Text}>{this.props.title}</Text>
+          <Text style={styles.cardTitleText}>{this.props.title}</Text>
         </View>
         <View style={styles.children}>
           {this.props.children}
         </View>
       </View>
+    );
+  }
+}
+
+class FriendPicker extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      text: '',
+      friendsList: []
+    }
+  }
+
+  addFriend = () => {
+    if (this.state.text.length) {
+      let newFList = this.state.friendsList;
+      newFList.push(this.state.text);
+      this.setState({
+        friendsList: newFList
+      });
+      this._textInput.setNativeProps({text: ''})
+      this.setState({text: ''});
+    }
+  }
+
+  render() {
+    return (
+      <Card title="Invite Your Friends">
+        <View style={{flex: 1, flexDirection: 'row', height: 40}}>
+          <View style={{flex: .6}}>
+            <TextInput
+              ref={component => this._textInput = component}
+              style={styles.input}
+              placeholder="Friend's name"
+              onChangeText={(text) => this.setState({text})}
+              onSubmitEditing={this.addFriend} />
+          </View>
+          <View>
+            <Button
+              title="Add"
+              onPress={this.addFriend}
+              color="#777"/>
+          </View>
+        </View>
+        <View>
+          {_.map((f, i) => (
+            <Text key={i} style={styles.listItem}>{'   • ' + f}</Text>),
+            this.state.friendsList
+          )}
+        </View>
+      </Card>
     );
   }
 }
@@ -54,21 +107,11 @@ class CreateSantaEvent extends Component {
       Alert.alert(this);
     }
   }
-  // <TextInput
-  // style={styles.input}
-  // onChangeText={() => null}
-  // value={this.state.text}
-  // />
-  // <Button
-  // style={styles.button}
-  // onPress={this.createButtonPress}
-  // title="Create Event"
-  // />
 
   render() {
     return (
       <View>
-        <Card title="Date">
+        <Card title="Set a Date">
           <View>
             <TouchableHighlight
               onPress={this.datePress}>
@@ -76,6 +119,10 @@ class CreateSantaEvent extends Component {
             </TouchableHighlight>
           </View>
         </Card>
+        <FriendPicker />
+        <View style={{marginTop: 30, marginHorizontal: 40}}>
+          <Button title="Finish" onPress={()=>null} />
+        </View>
       </View>
     );
   }
@@ -99,11 +146,11 @@ export default class SecretSanta extends Component {
            <Navigator.NavigationBar
              routeMapper={{
                LeftButton: (route, navigator, index, navState) =>
-                { return (<Text>Back</Text>); },
+                { return (<Text style={styles.navText}>Back</Text>); },
                RightButton: (route, navigator, index, navState) =>
-                 { return (<Text>Done</Text>); },
+                 { return (<Text style={styles.navText}>Done</Text>); },
                Title: (route, navigator, index, navState) =>
-                 { return (<Text>{route.title}</Text>); },
+                 { return (<Text style={styles.navText}>{route.title}</Text>); },
              }}
              style={styles.navBar}
            />
@@ -130,7 +177,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   cardTitleText: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '500',
   },
   cardContainer: {
@@ -140,9 +187,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     margin: 10,
     marginVertical: 5,
-    // paddingHorizontal: 10,
-    // paddingVertical: 5,
     overflow: 'hidden',
+  },
+  listItem: {
+    fontWeight: '400',
+    fontSize: 14
   },
   children: {
     margin: 10
@@ -153,15 +202,29 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 40,
-    width: windowWidth * .8
   },
   navView: {
-    paddingLeft: 20,
     paddingTop: 80
+  },
+  navText: {
+    margin: 8,
+    marginTop: 15,
+    fontSize: 16
   },
   navBar: {
     backgroundColor: 'gainsboro',
+    padding: 20,
   },
+  // completeButton: {
+  //   // flexDirection: 'row-reverse',
+  //   // justifyContent: 'space-between',
+  //   // marginVertical: 10,
+  //   // marginHorizontal: 10,
+  //   backgroundColor: '#ff6347',
+  //   position: 'absolute',
+  //   bottom: 0,
+  //   left: 0
+  // }
 });
 
 AppRegistry.registerComponent('SecretSanta', () => SecretSanta);
