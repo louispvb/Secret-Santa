@@ -12,8 +12,13 @@ import {
   Text,
   Navigator,
   ToolbarAndroid,
-  View
+  View,
+  TextInput,
+  Button,
+  Dimensions,
+  DatePickerAndroid
 } from 'react-native';
+
 //
 // export default class SecretSanta extends Component {
 //   render() {
@@ -34,61 +39,108 @@ import {
 //     );
 //   }
 // }
+const windowWidth = Dimensions.get('window').width;
 
-class HomePage extends Component {
+class CreateSantaEvent extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      text: 'ddfgdfg'
+    }
+  }
   render() {
-    return <Text>This is the homepage</Text>;
+    return (
+      <View>
+        <TextInput
+          style={styles.input}
+          onChangeText={() => null}
+          value={this.state.text}
+        />
+        <View style={{width: windowWidth * .5}}>
+          <Button
+            style={styles.button}
+            onPress={() => null}
+            title="Create Event"
+          />
+        </View>
+      </View>
+    );
   }
 }
 
 export default class SecretSanta extends Component {
   render() {
+    const routes = [
+      {title: 'Create An Event', index: 0},
+      {title: 'Suggest a Gift', index: 1}
+    ];
     return (
-      <View>
-        <ToolbarAndroid
-          logo={require('./assets/logo.svg')}
-          title="Secret Santa" />
-        <Navigator
-          initialRoute={{name: 'My First Scene', index: 0}}
-          renderScene={this.navRenderScene} />
-      </View>);
+      <Navigator
+        initialRoute={routes[0]}
+        initialRouteStack={routes}
+        renderScene={(route, nav) => {
+            return this.navRenderScene(route, nav);
+        }}
+        style={styles.navView}
+        navigationBar={
+           <Navigator.NavigationBar
+             routeMapper={{
+               LeftButton: (route, navigator, index, navState) =>
+                { return (<Text>Back</Text>); },
+               RightButton: (route, navigator, index, navState) =>
+                 { return (<Text>Done</Text>); },
+               Title: (route, navigator, index, navState) =>
+                 { return (<Text>{route.title}</Text>); },
+             }}
+             style={styles.navBar}
+           />
+        } />
+    );
   }
 
   navRenderScene(route, navigator) {
-    return (
-      <HomePage
-        name={route.name}
-        onForward={() => {
-          var nextIndex = route.index + 1;
-          navigator.push({
-            name: 'Scene ' + nextIndex,
-            index: nextIndex,
-          });
-        }}
-        onBack={() => {
-          if (route.index > 0) {
-            navigator.pop();
-          }
-        }}/>);
+    if (route.index === 0) {
+      return (<CreateSantaEvent />);
+    }
+    return (<Text>Oops, reached an invalid route</Text>);
   }
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+  // container: {
+  //   flex: 1,
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   backgroundColor: '#F5FCFF',
+  // },
+  // welcome: {
+  //   fontSize: 20,
+  //   textAlign: 'center',
+  //   margin: 10,
+  // },
+  // instructions: {
+  //   textAlign: 'center',
+  //   color: '#333333',
+  //   marginBottom: 5,
+  // },
+  button: {
+    width: windowWidth * .3,
+    backgroundColor: 'crimson'
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+  input: {
+    height: 40,
+    width: windowWidth * .8
   },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
+  navView: {
+    paddingLeft: 20,
+    paddingTop: 80
+  },
+  navBar: {
+    backgroundColor: 'gainsboro',
+    // height: 40,
+    // paddingTop: 20,
+    // paddingBottom: 20,
+    // marginBottom: 20,
   },
 });
 
