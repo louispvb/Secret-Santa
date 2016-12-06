@@ -11,6 +11,7 @@ import {
   Button,
   Dimensions,
   DatePickerAndroid,
+  TouchableHighlight,
   Alert
 } from 'react-native';
 
@@ -35,30 +36,44 @@ class CreateSantaEvent extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      text: 'ddfgdfg'
+      text: 'ddfgdfg',
+      date: 'Choose a day to exchange gifts',
     }
   }
 
-  async createButtonPress() {
-    const {month, day, year} = await DatePickerAndroid.open({date: new Date()});
-    Alert.alert(''+ month + day + year);
+  datePress = async () => {
+    try {
+      const {action, month, day, year} = await DatePickerAndroid.open({date: new Date()});
+      if (action !== DatePickerAndroid.dismissedAction) {
+        let dateStr = `${month} / ${day} / ${year}`;
+        this.setState({
+          date: dateStr
+        });
+      }
+    } catch (e) {
+      Alert.alert(this);
+    }
   }
+  // <TextInput
+  // style={styles.input}
+  // onChangeText={() => null}
+  // value={this.state.text}
+  // />
+  // <Button
+  // style={styles.button}
+  // onPress={this.createButtonPress}
+  // title="Create Event"
+  // />
 
   render() {
     return (
       <View>
-        <Card title="Pick a Date">
-          <TextInput
-            style={styles.input}
-            onChangeText={() => null}
-            value={this.state.text}
-          />
-          <View style={{width: windowWidth * .5}}>
-            <Button
-              style={styles.button}
-              onPress={this.createButtonPress}
-              title="Create Event"
-            />
+        <Card title="Date">
+          <View>
+            <TouchableHighlight
+              onPress={this.datePress}>
+              <Text>{this.state.date}</Text>
+            </TouchableHighlight>
           </View>
         </Card>
       </View>
@@ -125,7 +140,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     margin: 10,
     marginVertical: 5,
+    // paddingHorizontal: 10,
+    // paddingVertical: 5,
     overflow: 'hidden',
+  },
+  children: {
+    margin: 10
   },
   button: {
     width: windowWidth * .3,
