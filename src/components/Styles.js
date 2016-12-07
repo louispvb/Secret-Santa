@@ -11,13 +11,20 @@ export default StyleSheet.create({
     borderTopLeftRadius: 3,
     borderTopRightRadius: 2.5,
     borderBottomColor: '#d6d7da',
-    backgroundColor: '#f6f7f8',
+    backgroundColor: 'rgb(231, 59, 59)',
     paddingHorizontal: 10,
     paddingVertical: 5,
+  },
+  giftCardContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgb(252, 222, 203)'
   },
   cardTitleText: {
     fontSize: 16,
     fontWeight: '500',
+    color: 'white'
   },
   cardContainer: {
     borderRadius: 3,
@@ -27,6 +34,8 @@ export default StyleSheet.create({
     margin: 10,
     marginVertical: 5,
     overflow: 'hidden',
+    // width: 300,
+    // height: 300
   },
   listItem: {
     fontWeight: '400',
@@ -37,21 +46,22 @@ export default StyleSheet.create({
   },
   button: {
     width: windowWidth * .3,
-    backgroundColor: 'crimson',
   },
   input: {
     height: 40,
   },
   navView: {
-    paddingTop: 80
+    // paddingTop: 80,
+    backgroundColor: 'rgb(252, 222, 203)'
   },
   navText: {
     margin: 8,
     marginTop: 15,
-    fontSize: 16
+    fontSize: 16,
+    color: 'white'
   },
   navBar: {
-    backgroundColor: 'gainsboro',
+    backgroundColor: 'rgb(231, 59, 59)',
     padding: 20,
   },
   // completeButton: {

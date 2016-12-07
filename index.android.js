@@ -4,18 +4,19 @@ import {
   Text,
   Navigator,
   View,
-  TouchableHighlight,
+  TouchableOpacity,
 } from 'react-native';
-import Styles from './src/components/Styles.js';
-import SantaEventPage from './src/components/SantaEventPage.js';
-import Card from './src/components/Card.js';
+import Styles from './src/components/Styles';
+import SantaEventPage from './src/components/SantaEventPage';
+import Card from './src/components/Card';
+import GiftSwipeCards from './src/components/GiftSwipeCards'
 
 export default class SecretSanta extends Component {
   constructor(props) {
     super(props);
     this.routes = [
       {title: 'Create An Event', index: 0},
-      {title: 'Suggest a Gift', index: 1}
+      {title: 'Good Gifts?', index: 1}
     ];
     // var navigator;
     // BackAndroid.addEventListener('hardwareBackPress', () => {
@@ -32,22 +33,22 @@ export default class SecretSanta extends Component {
       return null;
     } else {
       return (
-        <TouchableHighlight onPress={() => navigator.pop()}>
+        <TouchableOpacity onPress={() => navigator.pop()}>
           <Text style={Styles.navText}>Back</Text>
-        </TouchableHighlight>
+        </TouchableOpacity>
       )
     }
     return (<Text style={Styles.navText}>Back</Text>);
   }
   rightButton = (route, navigator, index, navState) => {
     return (
-      <TouchableHighlight onPress={() => {
+      <TouchableOpacity onPress={() => {
         if (route.index === 0) {
           navigator.push(this.routes[1]);
         }
       }}>
-        <Text style={Styles.navText}>Done {index}</Text>
-      </TouchableHighlight>
+        <Text style={Styles.navText}>Done</Text>
+      </TouchableOpacity>
     );
   }
   titleText = (route, navigator, index, navState) => {
@@ -58,7 +59,7 @@ export default class SecretSanta extends Component {
     return (
       <Navigator
         ref={(nav) => {navigator = nav;}}
-        initialRoute={this.routes[0]}
+        initialRoute={this.routes[1]}
         initialRouteStack={this.routes}
         renderScene={(route, nav) => {
             return this.navRenderScene(route, nav);
@@ -80,7 +81,7 @@ export default class SecretSanta extends Component {
   navRenderScene(route, navigator) {
     let routeIndexed = [
       <SantaEventPage />,
-      <Text>Hi</Text>
+      <GiftSwipeCards />
     ];
     if (route.index >= routeIndexed.length)
       return (<Text>Oops, reached an invalid route</Text>);

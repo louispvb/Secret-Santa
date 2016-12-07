@@ -4,7 +4,6 @@ require('es6-promise').polyfill();
 var moment = require('moment');
 var crypto = require('crypto');
 var parseString = require('xml2js').parseString;
-var config = require('./productapi.config.js');
 var assign = require('lodash').assign;
 
 // Had to register an IAM user with an accessKey, and secretKey, create a new policy
@@ -79,7 +78,7 @@ class AmazonSearch {
           if (err) reject(err);
           else if (lookupError) reject(JSON.stringify(lookupError, null, 2));
           else resolve(result.ItemLookupResponse
-            ? result.ItemLookupResponse : result.SimilarityLookupResponse);
+            ? result.ItemLookupResponse.Items : result.SimilarityLookupResponse.Items);
         });
       }));
   }
@@ -100,3 +99,5 @@ class AmazonSearch {
     return this._lookupOperation(opts, 'SimilarityLookup');
   }
 }
+
+module.exports = AmazonSearch;

@@ -4,10 +4,12 @@ import {
   View,
   Button,
   DatePickerAndroid,
-  TouchableHighlight,
+  TextInput,
+  TouchableOpacity,
 } from 'react-native';
 import Card from './Card';
 import FriendPicker from './FriendPicker';
+import Styles from './Styles';
 
 export default class SantaEventPage extends Component {
   constructor(props) {
@@ -33,18 +35,25 @@ export default class SantaEventPage extends Component {
 
   render() {
     return (
-      <View>
+      <View style={{paddingTop: 80}}>
         <Card title="Set a Date">
           <View>
-            <TouchableHighlight
+            <TouchableOpacity
               onPress={this.datePress}>
               <Text>{this.state.date}</Text>
-            </TouchableHighlight>
+            </TouchableOpacity>
           </View>
         </Card>
         <FriendPicker />
+        <Card title="Pick a theme">
+          <TextInput
+            style={Styles.input}
+            placeholder="Humor & Candy"
+            onChangeText={(text) => this.setState({text})}
+            onSubmitEditing={this.addFriend} />
+        </Card>
         <View style={{marginTop: 30, marginHorizontal: 40}}>
-          <Button title="Finish" onPress={()=>null} />
+          <Button title="Finish" onPress={()=>null} color='rgb(231, 59, 59)'/>
         </View>
       </View>
     );
