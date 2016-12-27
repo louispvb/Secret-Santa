@@ -51,23 +51,35 @@ class ItemDesc extends Component {
         </View>
         <View style={{
           position: 'relative',
-          top: 70,
+          top: 30
+        }}>
+
+        </View>
+        <View style={{
+          position: 'relative',
+          top: 80,
           // left: 150,
           flex: 1,
           flexDirection: 'row'
         }}>
           <Text style={{
-            fontWeight: '100',
             fontFamily: 'sans-serif-thin',
-            fontSize: 20,
+            fontSize: 17,
             height: 30,
-            width: 140,
+            width: 110,
             textAlign: 'center'
           }}>For {this.props.data.toName}</Text>
           <Text style={{
-            fontSize: 20,
+            fontFamily: 'sans-serif-thin',
+            textAlign: 'center',
+            fontSize: 17,
+            width: 70,
+            height: 30
+          }}>{this.props.data.price}</Text>
+          <Text style={{
+            fontSize: 17,
             height: 30,
-            width: 140,
+            width: 110,
             color: 'rgb(121, 182, 204)',
             textAlign: 'center'
           }}>{this.props.data.votes} Votes</Text>
